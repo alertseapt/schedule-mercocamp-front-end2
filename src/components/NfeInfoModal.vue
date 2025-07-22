@@ -27,6 +27,14 @@
 
       <!-- Content -->
       <div class="modal-body">
+        <button 
+          v-if="canEditSchedule"
+          class="btn btn-sm btn-outline-primary me-2" 
+          @click="openEditModal"
+          title="Editar Agendamento"
+        >
+          <i class="fas fa-cog"></i> Editar Agendamento
+        </button>
         <!-- General Tab -->
         <div v-if="activeTab === 'general'" class="tab-content">
           <div class="info-grid">
@@ -176,8 +184,8 @@ export default {
     },
 
     canEditSchedule() {
-      const user = this.user
-      return user && user.level_access !== undefined && user.level_access !== 1
+      console.log('canEditSchedule user:', this.user)
+      return this.user && this.user.level_access !== undefined && this.user.level_access !== 1
     },
   },
 
