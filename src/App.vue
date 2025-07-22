@@ -403,9 +403,61 @@ export default {
       deliveriesLoading: false,
 
       notifications: [],
+      schedules: [],
+      selectedSchedules: [],
+      selectAll: false,
+      newDate: '',
+      bulkActionLoading: false,
+      showInfoModal: false,
+      showCreationModal: false,
+      showEditModal: false,
+      scheduleToEdit: null,
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: 0,
+        pages: 1,
+      },
     }
   },
-
+  computed: {
+    paginatedSchedules() {
+      return Array.isArray(this.schedules) ? this.schedules : []
+    },
+    totalPages() {
+      return this.pagination?.pages || 1
+    },
+    canCreateSchedules() {
+      try {
+        const userData = localStorage.getItem('user')
+        if (!userData) return false
+        const user = JSON.parse(userData)
+        return user.level_access !== undefined && user.level_access >= 0
+      } catch (error) {
+        return false
+      }
+    },
+    selectedScheduleStatuses() {
+      const selected = (this.schedules || []).filter(s => (this.selectedSchedules || []).includes(s.id))
+      return [...new Set(selected.map(s => s.status))]
+    },
+    canBulkManage() {
+      return (this.selectedSchedules || []).length > 0 && this.selectedScheduleStatuses.length === 1
+    },
+    userLevel() {
+      try {
+        const userData = localStorage.getItem('user')
+        if (!userData) return null
+        const user = JSON.parse(userData)
+        return user.level_access
+      } catch (error) {
+        return null
+      }
+    },
+    today() {
+      return new Date().toISOString().split('T')[0]
+    },
+  },
   async mounted() {
     try {
       await this.checkAuth()
