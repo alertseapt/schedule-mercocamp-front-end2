@@ -418,6 +418,7 @@ export default {
         total: 0,
         pages: 1,
       },
+      selectedSchedule: null,
     }
   },
   computed: {
@@ -734,6 +735,14 @@ export default {
       const d = new Date(date)
       if (isNaN(d)) return date
       return d.toLocaleDateString('pt-BR')
+    },
+    openInfoModal(schedule) {
+      this.selectedSchedule = schedule
+      this.showInfoModal = true
+    },
+    closeInfoModal() {
+      this.showInfoModal = false
+      this.selectedSchedule = null
     },
   },
 }
