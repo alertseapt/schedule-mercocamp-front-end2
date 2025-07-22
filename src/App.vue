@@ -463,6 +463,7 @@ export default {
       await this.checkAuth()
       initializePermissions()
       await this.loadDashboardData()
+      await this.loadSchedules() // Carregar agendamentos ao montar
     } catch (error) {
       console.error('Erro ao inicializar dashboard:', error)
       this.addNotification('Erro ao carregar dados do dashboard', 'error')
@@ -647,6 +648,27 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    async loadSchedules() {
+      this.loading = true
+      try {
+        const apiClient = new VueApiClient()
+        const response = await apiClient.getSchedules()
+        this.schedules = response.schedules || []
+        this.pagination.total = response.pagination?.total || this.schedules.length
+        this.pagination.pages = response.pagination?.pages || Math.ceil(this.schedules.length / this.pagination.limit)
+      } catch (error) {
+        this.schedules = []
+        this.addNotification('Erro ao carregar agendamentos', 'error')
+      } finally {
+        this.loading = false
+      }
+    },
+    openCreationModal() {
+      this.showCreationModal = true
+    },
+    closeCreationModal() {
+      this.showCreationModal = false
     },
   },
 }
