@@ -27,13 +27,128 @@
           <StatsCards :stats="dashboardStats" :loading="statsLoading">
           </StatsCards>
 
-          <!-- Pending Deliveries Table -->
-          <PendingDeliveries
-            :deliveries="pendingDeliveries"
-            :loading="deliveriesLoading"
-            @action="handleDeliveryAction"
-          >
-          </PendingDeliveries>
+          <!-- Tabela de Agendamentos (transferida de SchedulesList.vue) -->
+          <div class="schedules-list">
+            <!-- Header -->
+            <div class="page-header">
+              <h2>Lista de Agendamentos</h2>
+              <button
+                v-if="canCreateSchedules"
+                class="btn btn-success btn-new-schedule"
+                @click="openCreationModal"
+              >
+                <i class="fas fa-plus"></i> Novo Agendamento
+              </button>
+            </div>
+
+            <!-- Bulk Actions Bar -->
+            <div v-if="canBulkManage" class="bulk-actions-bar">
+              <div class="selected-info">
+                <span>{{ selectedSchedules.length }} agendamento(s) selecionado(s)</span>
+                <button class="btn btn-sm btn-outline-secondary" @click="clearSelection">
+                  <i class="fas fa-times"></i> Limpar seleção
+                </button>
+              </div>
+              <div class="bulk-actions">
+                <!-- Actions for Solicitado status -->
+                <div v-if="selectedScheduleStatuses[0] === 'Solicitado' && userLevel !== 1" class="action-group">
+                  <button class="btn btn-sm btn-success" @click="acceptSchedules" :disabled="bulkActionLoading">
+                    <i class="fas fa-check"></i> Aceitar Agendamento
+                  </button>
+                  <div class="date-change-group">
+                    <input type="date" v-model="newDate" class="form-control form-control-sm" :min="today" />
+                    <button class="btn btn-sm btn-warning" @click="changeDateToContestado" :disabled="!newDate || bulkActionLoading">
+                      <i class="fas fa-calendar-alt"></i> Alterar Data
+                    </button>
+                  </div>
+                </div>
+                <!-- Actions for Contestado status -->
+                <div v-if="selectedScheduleStatuses[0] === 'Contestado'" class="action-group">
+                  <div v-if="userLevel === 1" class="level-1-actions">
+                    <button class="btn btn-sm btn-primary" @click="acceptNewDate" :disabled="bulkActionLoading">
+                      <i class="fas fa-check"></i> Aceitar Nova Data
+                    </button>
+                    <span class="contact-text">Ou entre em contato com nossa equipe</span>
+                  </div>
+                  <div v-else class="non-level-1-actions">
+                    <button class="btn btn-sm btn-success" @click="confirmContestado" :disabled="bulkActionLoading">
+                      <i class="fas fa-check"></i> Confirmar
+                    </button>
+                    <div class="date-change-group">
+                      <input type="date" v-model="newDate" class="form-control form-control-sm" :min="today" />
+                      <button class="btn btn-sm btn-primary" @click="changeContestadoToAgendado" :disabled="!newDate || bulkActionLoading">
+                        <i class="fas fa-calendar-alt"></i> Agendar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+              <div v-if="loading" class="loading-container">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Carregando agendamentos...</p>
+              </div>
+              <div v-else-if="schedules.length === 0" class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>Nenhum agendamento encontrado</h3>
+                <p>Não há agendamentos que correspondam aos filtros aplicados.</p>
+              </div>
+              <table v-else class="schedules-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <input type="checkbox" v-model="selectAll" @change="toggleSelectAll" :disabled="schedules.length === 0" />
+                    </th>
+                    <th>N° NF-e</th>
+                    <th>Cliente</th>
+                    <th>Data de Entrega</th>
+                    <th>Volumes</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="schedule in paginatedSchedules" :key="schedule.id">
+                    <td>
+                      <input type="checkbox" :value="schedule.id" v-model="selectedSchedules" @change="onScheduleSelect" :disabled="!canSelectSchedule(schedule)" />
+                    </td>
+                    <td>{{ schedule.number }}</td>
+                    <td>{{ schedule.client }}</td>
+                    <td>{{ formatDate(schedule.date) }}</td>
+                    <td>{{ schedule.case_count }}</td>
+                    <td>
+                      <span :class="'status-badge ' + getStatusBadge(schedule.status).class" class="status-badge">
+                        {{ getStatusBadge(schedule.status).label }}
+                      </span>
+                    </td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary" @click="openInfoModal(schedule)" title="Mais informações">
+                        <i class="fas fa-info-circle"></i>
+                        Detalhes
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div v-if="totalPages > 1" class="pagination">
+                <button class="btn btn-sm btn-outline-secondary" :disabled="pagination.page === 1" @click="changePage(pagination.page - 1)">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <span class="page-info">Página {{ pagination.page }} de {{ totalPages }}</span>
+                <button class="btn btn-sm btn-outline-secondary" :disabled="pagination.page === totalPages" @click="changePage(pagination.page + 1)">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Modals -->
+            <NfeInfoModal v-if="showInfoModal" :nfe-data="selectedSchedule" :show-modal="showInfoModal" @close="closeInfoModal" @edit="openEditModal" />
+            <ScheduleCreationModal v-if="showCreationModal" :show-modal="showCreationModal" @close="closeCreationModal" @created="loadSchedules" />
+            <ScheduleEditModal v-if="showEditModal" :schedule-data="scheduleToEdit" :show-modal="showEditModal" @close="closeEditModal" @updated="handleScheduleUpdated" @notification="addNotification" />
+          </div>
         </div>
 
         <!-- Schedules List -->
