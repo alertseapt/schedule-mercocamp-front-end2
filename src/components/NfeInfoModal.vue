@@ -7,19 +7,9 @@
           <i class="fas fa-file-invoice"></i>
           Informações da NF-e
         </h3>
-        <div class="header-actions">
-          <button 
-            v-if="canEditSchedule"
-            class="btn btn-sm btn-outline-primary me-2" 
-            @click="openEditModal"
-            title="Editar Agendamento"
-          >
-            <i class="fas fa-cog"></i>
-          </button>
-          <button class="btn-close" @click="closeModal">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
+        <button class="btn-close" @click="closeModal">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
 
       <!-- Tabs -->
@@ -95,8 +85,8 @@
       </div>
 
       <!-- Footer -->
-      <div class="modal-footer">
-        <div class="footer-info">
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <div class="footer-info" style="margin-left: auto;">
           <small class="text-muted">
             <i class="fas fa-info-circle"></i>
             Última atualização:
