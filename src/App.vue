@@ -101,7 +101,7 @@ function initializePermissions() {
 // Cliente API para Vue.js
 class VueApiClient {
   constructor() {
-    this.baseURL = 'http://localhost:4000/api'
+    this.baseURL = 'https://schedule-mercocamp-back-end.up.railway.app/api'
     this.token = localStorage.getItem('token')
   }
 

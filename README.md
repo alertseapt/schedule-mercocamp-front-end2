@@ -63,7 +63,7 @@ npm run dev        # Servidor de desenvolvimento (HMR ativo)
 - Abre em `http://localhost:8000` (ou próxima porta disponível)
 - Hot Module Replacement para desenvolvimento ágil
 - Modo desenvolvimento do Vite
-- **⚠️ Requer backend rodando em `http://localhost:4000`**
+- **⚠️ Requer backend rodando em `https://schedule-mercocamp-back-end.up.railway.app/api`**
 
 ### **Produção**
 ```bash
@@ -155,7 +155,7 @@ data() {
 ```javascript
 class VueApiClient {
   constructor() {
-    this.baseURL = 'http://localhost:4000/api'
+    this.baseURL = 'https://schedule-mercocamp-back-end.up.railway.app/api'
     this.token = localStorage.getItem('token')
   }
 
