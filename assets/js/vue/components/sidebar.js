@@ -50,9 +50,10 @@ const SidebarComponent = {
             if (!this.user) return 'Usuário';
             
             switch (this.user.level_access) {
-                case 0: return 'Usuário';
-                case 1: return 'Administrador';
-                case 2: return 'Gerente';
+                case 0: return 'Desenvolvedor';
+                case 1: return 'Usuário';
+                case 2: return 'Administrador';
+                case 3: return 'Gerente';
                 default: return 'Usuário';
             }
         }

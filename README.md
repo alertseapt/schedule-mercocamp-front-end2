@@ -329,3 +329,47 @@ O sistema LogiReceive foi modernizado com sucesso usando Vue.js 3, oferecendo:
 
 Este projeto faz parte do sistema YOUWARE/LogiReceive.
 Desenvolvido com ❤️ em Vue.js 3. 
+
+## 🛠️ Instruções para o Backend (Integração NFe)
+
+Estas instruções são essenciais para garantir a integração correta entre o front-end e o back-end no sistema de agendamento via NFe:
+
+### 1. Endpoints REST obrigatórios
+- **GET /api/clients**: Retorna lista de clientes cadastrados. Resposta: `{ "clients": [ { "cnpj": "...", "name": "..." } ] }`. Requer autenticação JWT.
+- **POST /api/products/check-existing**: Recebe array de produtos e retorna se já existem no banco. Requer autenticação JWT.
+- **POST /api/schedules/create-with-products**: Cria novo agendamento a partir dos dados parseados do XML da NFe. Body: `{ nfe_data: { ... } }`. Requer autenticação JWT.
+- **GET /api/schedules**: Lista agendamentos com filtros e paginação. Requer autenticação JWT.
+
+### 2. Autenticação JWT
+- Todos os endpoints (exceto login) exigem header: `Authorization: Bearer <token>`.
+- Backend deve validar o token e retornar 401 se inválido.
+
+### 3. Banco de Dados
+- Tabela de clientes, produtos e agendamentos devem existir e estar compatíveis com os contratos da API.
+
+### 4. CORS
+- Backend deve aceitar requisições do front-end (localhost, 127.0.0.1, origem de arquivo).
+
+### 5. Tratamento de Erros
+- Retornar status HTTP adequados (404, 400, 401, etc) e mensagens de erro claras.
+
+### 6. Exemplo de rota (Node.js/Express)
+```js
+app.get('/api/clients', authenticateJWT, async (req, res) => {
+  const clients = await db.query('SELECT cnpj, name FROM clients');
+  res.json({ clients });
+});
+```
+
+### 7. Documentação
+- O backend deve seguir fielmente os contratos de request/response descritos em `API_FRONTEND_DOCUMENTATION.md`.
+
+---
+
+## 📜 Histórico e Notas Técnicas
+
+- Todos os componentes Vue.js foram criados de forma modular, com integração total à API REST.
+- O sistema de agendamento via NFe faz o parse do XML no front-end e envia os dados já estruturados para o backend.
+- O fluxo de autenticação é JWT, com renovação automática e proteção de rotas.
+- O sistema foi testado com mock e com API real, e possui tratamento de erros e feedback visual em todas as ações.
+- Para detalhes completos dos endpoints e contratos, consulte `API_FRONTEND_DOCUMENTATION.md`. 

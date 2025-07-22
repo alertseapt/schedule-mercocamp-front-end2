@@ -5,7 +5,7 @@ Documentação completa para integração com a API REST de gerenciamento de age
 ## 📋 Base URL
 
 ```
-https://schedule-mercocamp-back-end.up.railway.app/api
+http://localhost:3000/api
 ```
 
 ## ⚙️ Configuração Inicial
@@ -34,6 +34,100 @@ DB_PASSWORD=sua_senha
 ```bash
 npm start
 ```
+
+## ⚠️ ATENÇÃO - Inconsistência Encontrada
+
+**IMPORTANTE:** Foi detectada uma inconsistência entre a estrutura do banco de dados e o código da aplicação:
+
+- **Estrutura do banco:** `level_access` é definido como JSON
+- **Código da aplicação:** `level_access` é tratado como integer (0-2)
+
+**Recomendação:** Ajustar a estrutura do banco para `INT` ou atualizar o código para trabalhar com JSON. Atualmente, a API funciona com integers conforme documentado abaixo.
+
+**Níveis de acesso atuais:**
+- `0` - Desenvolvedor (acesso total a todas as funcionalidades)
+- `1` - Usuário comum (acesso limitado conforme cli_access)
+- `2` - Administrador (acesso administrativo)
+- `3` - Gerente (acesso gerencial - pode deletar usuários)
+
+## 🗄️ Estrutura dos Bancos de Dados
+
+### **Banco dbusers:**
+**Tabela: users**
+- `id` (int, auto_increment) - Identificador único
+- `user` (varchar(50)) - Nome de usuário
+- `password` (varchar(50)) - Senha do usuário
+- `name` (varchar(50)) - Nome completo
+- `email` (varchar(50)) - Email do usuário
+- `level_access` (json) - Níveis de acesso (⚠️ ATENÇÃO: estrutura é JSON no banco mas código trata como integer 0-2)
+- `cli_access` (json) - Acesso por cliente (CNPJ → dados do cliente)
+- `created_by` (varchar(50)) - Usuário que criou
+- `created_at` (datetime) - Data de criação
+
+### **Banco dbcheckin:**
+**Tabela: products**
+- `cli_code` (varchar(50)) - Código do cliente
+- `cli_cnpj` (varchar(14)) - CNPJ do cliente
+- `cli_desc` (varchar(100)) - Descrição do cliente
+- `supp_code` (varchar(50)) - Código do fornecedor
+- `supp_cnpj` (varchar(14)) - CNPJ do fornecedor
+- `supp_desc` (varchar(100)) - Descrição do fornecedor
+- `user` (varchar(50)) - Usuário responsável
+- `date` (datetime) - Data do registro
+- `hist` (json) - Histórico de alterações
+- `latest_into_case` (int) - Último caso relacionado
+
+**Tabela: schedule_list**
+- `id` (int, auto_increment) - Identificador único
+- `number` (tinyint) - Número do agendamento (0-255)
+- `nfe_key` (varchar(44)) - Chave da NFe
+- `client` (varchar(14)) - CNPJ do cliente
+- `case_count` (int) - Quantidade de casos
+- `date` (date) - Data do agendamento
+- `status` (varchar(20)) - Status do agendamento
+- `historic` (json) - Histórico de alterações
+- `supplier` (varchar(50)) - Fornecedor
+- `qt_prod` (int) - Quantidade de produtos
+- `history` (json) - Histórico adicional
+- `info` (json) - Informações adicionais
+
+## 🌐 Configuração do CORS
+
+A API está configurada para aceitar requests das seguintes origens:
+- `http://localhost:3000`
+- `http://localhost:3001`
+- `http://localhost:8080`
+- `http://127.0.0.1:3000`
+- `http://127.0.0.1:3001`
+- `http://127.0.0.1:8080`
+- `null` (para arquivos HTML abertos diretamente no navegador)
+
+### 🖥️ Executando o Front-end
+
+Para evitar problemas de CORS, recomenda-se executar o front-end através de um servidor web:
+
+**Opção 1: Usando Python (recomendado)**
+```bash
+# Python 3
+python -m http.server 8080
+
+# Python 2
+python -m SimpleHTTPServer 8080
+```
+
+**Opção 2: Usando Node.js**
+```bash
+npx http-server -p 8080
+```
+
+**Opção 3: Usando Live Server (VS Code)**
+- Instale a extensão "Live Server" no VS Code
+- Clique com o botão direito no arquivo HTML
+- Selecione "Open with Live Server"
+
+**Opção 4: Abrindo arquivo HTML diretamente**
+- A API permite origem `null` para desenvolvimento
+- Simplesmente abra o arquivo HTML no navegador
 
 ## 🔐 Autenticação
 
@@ -71,7 +165,13 @@ Content-Type: application/json
     "user": "nome_usuario",
     "name": "Nome Completo",
     "email": "email@example.com",
-    "level_access": 1
+    "level_access": 1,
+    "cli_access": {
+      "12345678000100": {
+        "nome": "Cliente Exemplo",
+        "numero": "001"
+      }
+    }
   },
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
@@ -101,7 +201,12 @@ Content-Type: application/json
   "name": "Nome Completo",
   "email": "email@example.com",
   "level_access": 0,
-  "cli_access": {},
+  "cli_access": {
+    "12345678000100": {
+      "nome": "Cliente Exemplo",
+      "numero": "001"
+    }
+  },
   "created_by": "admin_user"
 }
 ```
@@ -123,7 +228,13 @@ Authorization: Bearer <token>
       "user": "nome_usuario",
       "name": "Nome Completo",
       "email": "email@example.com",
-      "level_access": 1,
+             "level_access": 1,
+      "cli_access": {
+        "12345678000100": {
+          "nome": "Cliente Exemplo",
+          "numero": "001"
+        }
+      },
       "created_by": "admin",
       "created_at": "2024-01-01T10:00:00.000Z"
     }
@@ -195,7 +306,15 @@ Authorization: Bearer <token>
       "supp_cnpj": "98765432000100",
       "supp_desc": "Fornecedor Exemplo Ltda",
       "user": "usuario_responsavel",
-      "date": "2024-01-01T10:00:00.000Z"
+      "date": "2024-01-01T10:00:00.000Z",
+      "hist": {
+        "created": {
+          "timestamp": "2024-01-01T10:00:00.000Z",
+          "user": "admin",
+          "action": "Produto criado"
+        }
+      },
+      "latest_into_case": 123
     }
   ],
   "pagination": {
@@ -277,8 +396,8 @@ Authorization: Bearer <token>
     {
       "id": 1,
       "number": 1,
-      "nfe_key": 123456789,
-      "client": 78,
+      "nfe_key": "12345678901234567890123456789012345678901234",
+      "client": "12345678000100",
       "case_count": 10,
       "date": "2024-01-15",
       "status": "pending",
@@ -290,11 +409,18 @@ Authorization: Bearer <token>
           "comment": "Agendamento criado no sistema"
         }
       },
+      "supplier": "FORNECEDOR123",
       "qt_prod": 50,
+      "history": {
+        "modifications": []
+      },
+      "info": {
+        "additional_data": "Informações extras"
+      },
       "client_info": {
         "cnpj": "12345678000100",
         "name": "Cliente Exemplo",
-        "number": "78"
+        "number": "001"
       }
     }
   ],
@@ -321,11 +447,12 @@ Content-Type: application/json
 
 {
   "number": 1,
-  "nfe-key": 123456789,
-  "client": 78,
+  "nfe-key": "12345678901234567890123456789012345678901234",
+  "client": "12345678000100",
   "case_count": 10,
   "date": "2024-01-15",
   "status": "pending",
+  "supplier": "FORNECEDOR123",
   "qt_prod": 50
 }
 ```
@@ -339,7 +466,8 @@ Content-Type: application/json
 {
   "case_count": 15,
   "status": "processing",
-  "qt_prod": 60
+  "qt_prod": 60,
+  "supplier": "NOVO_FORNECEDOR"
 }
 ```
 
@@ -358,6 +486,73 @@ Content-Type: application/json
   }
 }
 ```
+
+#### **Parse de XML NFe** (Nova Rota)
+```http
+POST /api/schedules/parse-xml
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+Enviar arquivo XML via FormData com key "xml_file"
+```
+
+**Resposta de Sucesso:**
+```json
+{
+  "success": true,
+  "message": "XML parseado com sucesso",
+  "data": {
+    "nfe_number": "123456",
+    "nfe_key": "12345678901234567890123456789012345678901234",
+    "nfe_model": "55",
+    "nfe_series": "1",
+    "nfe_date": "2023-12-01T10:00:00",
+    "issuer": {
+      "cnpj": "12345678000195",
+      "name": "Empresa Emissora LTDA",
+      "fantasy": "Emissora"
+    },
+    "recipient": {
+      "cnpj": "98765432000187",
+      "name": "Cliente Destinatário"
+    },
+    "products": [
+      {
+        "item": 1,
+        "code": "PROD001",
+        "description": "Produto Teste",
+        "ncm": "12345678",
+        "quantity": 10,
+        "unit": "UN",
+        "unit_value": 15.50,
+        "total_value": 155.00
+      }
+    ],
+    "total_products": 1
+  }
+}
+```
+
+**Possíveis Erros:**
+```json
+{
+  "error": "Arquivo XML é obrigatório"
+}
+```
+
+```json
+{
+  "error": "Estrutura XML inválida - NFe não encontrada"
+}
+```
+
+```json
+{
+  "error": "Erro ao processar arquivo XML"
+}
+```
+
+> **Nota:** Esta rota apenas faz o parse do XML e retorna os dados estruturados, sem salvar no banco de dados. É ideal para validar o conteúdo antes de criar um agendamento.
 
 #### **Deletar Agendamento** (Manager)
 ```http
@@ -389,6 +584,49 @@ GET /api/health
 #### **Informações da API**
 ```http
 GET /api/info
+```
+
+### **Verificar Produtos Existentes**
+```http
+POST /api/products/check-existing
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "supp_code": "SUPP001",
+      "supp_cnpj": "98765432000100",
+      "cli_cnpj": "12345678000100"
+    }
+  ]
+}
+```
+**Resposta:**
+```json
+{
+  "results": [
+    {
+      "supp_code": "SUPP001",
+      "exists": true,
+      "data": { /* dados do produto se existir */ }
+    }
+  ]
+}
+```
+
+### **Listar Clientes (WCL)**
+```http
+GET /api/clients
+Authorization: Bearer <token>
+```
+**Resposta:**
+```json
+{
+  "clients": [
+    { "cnpj": "12345678000100", "name": "Cliente Exemplo" }
+  ]
+}
 ```
 
 ## 📊 Status Codes
@@ -526,6 +764,32 @@ const updateScheduleStatus = async (scheduleId, status, comment) => {
 };
 ```
 
+## Novo fluxo de criação de agendamento via NFe
+
+1. O frontend deve fazer o parse do XML da NFe localmente (exemplo: usando xml2js ou similar em JS).
+2. Após o usuário revisar os dados, envie o JSON resultante para o endpoint:
+
+POST /api/schedules/create-with-products
+
+Body:
+{
+  nfe_data: {
+    number: <string>,
+    nfe_key: <string>,
+    client_cnpj: <string>,
+    client_name: <string>,
+    supplier_cnpj: <string>,
+    supplier_name: <string>,
+    case_count: <number>,
+    date: <string>,
+    products: [ ... ],
+    qt_prod: <number>
+  }
+}
+
+- Não envie o arquivo XML para o backend.
+- O backend não faz mais o parse do XML, apenas recebe e valida o JSON.
+
 ## 🛡️ Considerações de Segurança
 
 ### **Token Management**
@@ -573,7 +837,8 @@ const handleApiError = (error) => {
 - `password` (string, 3-50 chars)
 - `name` (string, 2-50 chars)
 - `email` (email válido, opcional)
-- `level_access` (integer, 0-2)
+- `level_access` (integer, 0-2: 0=usuário, 1=admin, 2=manager)
+- `cli_access` (object, estrutura JSON: cnpj → {nome, numero})
 - `created_by` (string, 50 chars)
 
 #### **Produto:**
@@ -582,14 +847,17 @@ const handleApiError = (error) => {
 - `cli_desc` (string, 100 chars)
 - `supp_code` (string, 50 chars)
 - `supp_cnpj` (string, 14 chars)
+- `supp_desc` (string, 100 chars)
 - `user` (string, 50 chars)
 
 #### **Agendamento:**
-- `number` (integer, 0-255)
-- `nfe-key` (integer)
-- `client` (integer)
+- `number` (tinyint, 0-255)
+- `nfe_key` (string, máximo 44 chars)
+- `client` (string, 14 chars - CNPJ)
 - `case_count` (integer, ≥0)
-- `date` (ISO date)
+- `date` (date)
+- `status` (string, 20 chars)
+- `supplier` (string, 50 chars)
 - `qt_prod` (integer, ≥0)
 
 ## 🎯 Dicas de Implementação
@@ -601,6 +869,9 @@ const handleApiError = (error) => {
 5. **Implemente retry** para requisições falhadas
 6. **Cache dados** quando apropriado
 7. **Teste cenários de erro** thoroughly
+8. **Considere level_access como integer** (0=usuário, 1=admin, 2=manager)
+9. **Trate campos JSON** adequadamente no frontend
+10. **Use CNPJ formatado** para campos de cliente
 
 ## 📊 Status da API
 
@@ -627,4 +898,4 @@ GET /api/health
 ---
 
 **Esta documentação fornece todos os recursos necessários para integração completa com a API.**
-**🔄 Última atualização:** Janeiro 2024 
+**🔄 Última atualização:** Janeiro 2025 - Atualizada com estrutura real das tabelas 

@@ -32,7 +32,7 @@
             <!-- Main Content -->
             <main class="main-content">
                 <!-- Dashboard Content -->
-                <div class="content-area">
+                <div v-if="!showSchedulesList" class="content-area">
                     <!-- Stats Cards -->
                     <stats-cards 
                         :stats="dashboardStats"
@@ -51,6 +51,13 @@
                         :loading="deliveriesLoading"
                         @action="handleDeliveryAction">
                     </pending-deliveries>
+                </div>
+                
+                <!-- Schedules List -->
+                <div v-if="showSchedulesList" class="content-area">
+                    <schedules-list 
+                        @notification="addNotification">
+                    </schedules-list>
                 </div>
             </main>
         </div>
@@ -76,6 +83,13 @@
     <script src="assets/js/vue/components/recent-activities.js"></script>
     <script src="assets/js/vue/components/pending-deliveries.js"></script>
     <script src="assets/js/vue/components/notifications.js"></script>
+    
+    <!-- Schedule Components -->
+    <script src="assets/js/vue/components/schedule-filters.js"></script>
+    <script src="assets/js/vue/components/nfe-info-modal.js"></script>
+    <script src="assets/js/vue/components/product-edit-modal.js"></script>
+    <script src="assets/js/vue/components/schedule-creation-modal.js"></script>
+    <script src="assets/js/vue/components/schedules-list.js"></script>
     
     <!-- Vue Main App -->
     <script src="assets/js/vue/main.js"></script>
