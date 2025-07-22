@@ -44,7 +44,7 @@ export default {
           id: 'pending',
           title: 'Entregas Pendentes',
           value: this.stats.pendingDeliveries,
-          icon: 'fas fa-truck',
+          icon: 'fa-solid fa-hourglass-half',
           type: 'pending',
         },
         {
