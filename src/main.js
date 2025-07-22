@@ -11,6 +11,6 @@ const app = createApp(App)
 app.config.globalProperties.$http = axios
 
 // Configurar axios defaults
-axios.defaults.baseURL = 'http://localhost:4000/api'
+axios.defaults.baseURL = 'https://schedule-mercocamp-back-end.up.railway.app/api'
 
 app.mount('#app')
