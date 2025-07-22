@@ -458,24 +458,35 @@ export default {
       return new Date().toISOString().split('T')[0]
     },
   },
+  async mounted() {
+    try {
+      console.log('Iniciando checkAuth...')
+      await this.checkAuth()
+      console.log('Permissões...')
+      initializePermissions()
+      console.log('Carregando dashboard...')
+      await this.loadDashboardData()
+      console.log('Carregando agendamentos...')
+      await this.loadSchedules() // Carregar agendamentos ao montar
+      console.log('Tudo carregado!')
+    } catch (error) {
+      console.error('Erro ao inicializar dashboard:', error)
+      this.addNotification('Erro ao carregar dados do dashboard', 'error')
+    } finally {
+      this.loading = false
+      console.log('Finalizou loading')
+    }
+  },
   methods: {
     async checkAuth() {
       const token = localStorage.getItem('token')
       const userData = localStorage.getItem('user')
-
-      console.log('Verificando autenticação...', {
-        token: !!token,
-        userData: !!userData,
-      })
-
+      console.log('Verificando autenticação...', { token: !!token, userData: !!userData })
       if (!token || !userData) {
-        console.log(
-          'Redirecionando para login - token ou userData não encontrados'
-        )
+        console.log('Redirecionando para login - token ou userData não encontrados')
         window.location.href = '/login.html'
         return
       }
-
       try {
         this.user = JSON.parse(userData)
         console.log('Usuário autenticado:', this.user)
@@ -491,14 +502,19 @@ export default {
         this.loadRecentActivities(),
         this.loadPendingDeliveries(),
       ]
-
-      await Promise.all(promises)
+      try {
+        await Promise.all(promises)
+        console.log('Dashboard carregado com sucesso!')
+      } catch (error) {
+        console.error('Erro ao carregar dashboard:', error)
+        this.addNotification('Erro ao carregar dashboard', 'error')
+      }
     },
 
     async loadStats() {
       this.statsLoading = true
       try {
-        // Buscar todos os agendamentos do usuário
+        console.log('Buscando estatísticas...')
         const response = await apiClient.getSchedules()
         const schedules = response.schedules || []
         this.dashboardStats = {
@@ -507,6 +523,7 @@ export default {
           conferencia: schedules.filter(s => s.status === 'Recebido').length,
           tratativa: schedules.filter(s => s.status === 'Em Tratativa').length,
         }
+        console.log('Estatísticas carregadas:', this.dashboardStats)
       } catch (error) {
         console.error('Erro ao carregar estatísticas:', error)
         this.addNotification('Erro ao carregar estatísticas', 'error')
@@ -518,7 +535,9 @@ export default {
     async loadRecentActivities() {
       this.activitiesLoading = true
       try {
+        console.log('Buscando atividades recentes...')
         this.recentActivities = await apiClient.getRecentActivities()
+        console.log('Atividades recentes carregadas:', this.recentActivities)
       } catch (error) {
         console.error('Erro ao carregar atividades:', error)
         this.addNotification('Erro ao carregar atividades recentes', 'error')
@@ -530,7 +549,9 @@ export default {
     async loadPendingDeliveries() {
       this.deliveriesLoading = true
       try {
+        console.log('Buscando entregas pendentes...')
         this.pendingDeliveries = await apiClient.getPendingDeliveries()
+        console.log('Entregas pendentes carregadas:', this.pendingDeliveries)
       } catch (error) {
         console.error('Erro ao carregar entregas:', error)
         this.addNotification('Erro ao carregar entregas agendadas', 'error')
@@ -638,16 +659,20 @@ export default {
     async loadSchedules() {
       this.loading = true
       try {
+        console.log('Buscando agendamentos...')
         const apiClient = new VueApiClient()
         const response = await apiClient.getSchedules()
         this.schedules = response.schedules || []
         this.pagination.total = response.pagination?.total || this.schedules.length
         this.pagination.pages = response.pagination?.pages || Math.ceil(this.schedules.length / this.pagination.limit)
+        console.log('Agendamentos carregados:', this.schedules)
       } catch (error) {
         this.schedules = []
+        console.error('Erro ao carregar agendamentos:', error)
         this.addNotification('Erro ao carregar agendamentos', 'error')
       } finally {
         this.loading = false
+        console.log('Finalizou loading dos agendamentos')
       }
     },
     openCreationModal() {
