@@ -174,6 +174,7 @@ import RecentActivities from './components/RecentActivities.vue'
 import PendingDeliveries from './components/PendingDeliveries.vue'
 import NotificationsComponent from './components/NotificationsComponent.vue'
 import SchedulesList from './components/SchedulesList.vue'
+import NfeInfoModal from './components/NfeInfoModal.vue'
 import { checkPermission, checkUserLevel } from './utils/permissions.js'
 import axios from 'axios'
 
@@ -379,6 +380,7 @@ export default {
     PendingDeliveries,
     NotificationsComponent,
     SchedulesList,
+    NfeInfoModal,
   },
 
   data() {
