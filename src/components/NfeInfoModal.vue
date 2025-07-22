@@ -118,6 +118,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    user: {
+      type: Object,
+      default: () => ({}),
+    },
   },
 
   data() {
@@ -172,17 +176,8 @@ export default {
     },
 
     canEditSchedule() {
-      try {
-        const userData = localStorage.getItem('user')
-        if (!userData) return false
-        
-        const user = JSON.parse(userData)
-        // Apenas usuários com level_access diferente de 1 podem editar
-        return user.level_access !== undefined && user.level_access !== 1
-      } catch (error) {
-        console.error('Erro ao verificar permissões de edição:', error)
-        return false
-      }
+      const user = this.user
+      return user && user.level_access !== undefined && user.level_access !== 1
     },
   },
 

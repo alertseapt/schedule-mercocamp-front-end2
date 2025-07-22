@@ -145,7 +145,7 @@
             </div>
 
             <!-- Modals -->
-            <NfeInfoModal v-if="showInfoModal" :nfe-data="selectedSchedule" :show-modal="showInfoModal" @close="closeInfoModal" @edit="openEditModal" />
+            <NfeInfoModal v-if="showInfoModal" :nfe-data="selectedSchedule" :show-modal="showInfoModal" :user="user" @close="closeInfoModal" @edit="openEditModal" />
             <ScheduleCreationModal v-if="showCreationModal" :show-modal="showCreationModal" @close="closeCreationModal" @created="loadSchedules" />
             <ScheduleEditModal v-if="showEditModal" :schedule-data="scheduleToEdit" :show-modal="showEditModal" @close="closeEditModal" @updated="handleScheduleUpdated" @notification="addNotification" />
           </div>
