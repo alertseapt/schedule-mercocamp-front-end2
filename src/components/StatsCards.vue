@@ -42,23 +42,23 @@ export default {
       return [
         {
           id: 'pending',
-          title: 'Entregas Pendentes',
+          title: 'Solicitações',
           value: this.stats.pendingDeliveries,
           icon: 'fa-solid fa-hourglass-half',
           type: 'pending',
         },
         {
           id: 'processing',
-          title: 'Em Conferência',
+          title: 'Agendamentos',
           value: this.stats.processing,
-          icon: 'fas fa-boxes',
+          icon: 'fa-solid fa-truck',
           type: 'processing',
         },
         {
           id: 'completed',
-          title: 'Finalizados da Semana',
+          title: 'Conferência',
           value: this.stats.completedToday,
-          icon: 'fas fa-check-circle',
+          icon: 'fa-solid fa-magnifying-glass',
           type: 'completed',
         },
         {
