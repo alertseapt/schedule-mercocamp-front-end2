@@ -351,7 +351,15 @@ export default {
     async loadStats() {
       this.statsLoading = true
       try {
-        this.dashboardStats = await apiClient.getDashboardStats()
+        // Buscar todos os agendamentos do usuário
+        const response = await apiClient.getSchedules()
+        const schedules = response.schedules || []
+        this.dashboardStats = {
+          solicitacoes: schedules.filter(s => s.status === 'Solicitado').length,
+          agendamentos: schedules.filter(s => s.status === 'Agendado').length,
+          conferencia: schedules.filter(s => s.status === 'Recebido').length,
+          tratativa: schedules.filter(s => s.status === 'Em Tratativa').length,
+        }
       } catch (error) {
         console.error('Erro ao carregar estatísticas:', error)
         this.addNotification('Erro ao carregar estatísticas', 'error')
