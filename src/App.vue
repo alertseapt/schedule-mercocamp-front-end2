@@ -457,6 +457,54 @@ export default {
     today() {
       return new Date().toISOString().split('T')[0]
     },
+    canSelectSchedule(schedule) {
+      // Verificar se pode selecionar baseado no status e permissões do usuário
+      const allowedStatuses = ['Solicitado', 'Contestado']
+      if (!allowedStatuses.includes(schedule.status)) return false
+      // Se já tem agendamentos selecionados, só pode selecionar do mesmo status
+      if ((this.selectedSchedules || []).length > 0) {
+        const selectedStatuses = this.selectedScheduleStatuses
+        if (selectedStatuses.length === 1 && !selectedStatuses.includes(schedule.status)) {
+          return false
+        }
+      }
+      return true
+    },
+    getStatusBadge(status) {
+      const statusConfig = {
+        Solicitado: { class: 'warning', label: 'Solicitado' },
+        Contestado: { class: 'contestado', label: 'Contestado' },
+        Agendado: { class: 'primary', label: 'Agendado' },
+        Recebido: { class: 'success', label: 'Recebido' },
+        Tratativa: { class: 'danger', label: 'Tratativa' },
+        Estoque: { class: 'success', label: 'Estoque' },
+        Recusar: { class: 'danger', label: 'Recusar' },
+        Recusado: { class: 'dark', label: 'Recusado' },
+        Cancelado: { class: 'secondary', label: 'Cancelado' },
+      }
+      return statusConfig[status] || { class: 'secondary', label: 'Desconhecido' }
+    },
+    onScheduleSelect() {
+      // Verificar se todos os agendamentos selecionáveis estão selecionados
+      const selectableSchedules = (this.paginatedSchedules || []).filter(schedule => 
+        this.canSelectSchedule(schedule)
+      )
+      this.selectAll = selectableSchedules.length > 0 && 
+        selectableSchedules.every(schedule => (this.selectedSchedules || []).includes(schedule.id))
+      // Verificar se os agendamentos selecionados têm o mesmo status
+      const selectedStatuses = this.selectedScheduleStatuses
+      if (selectedStatuses.length > 1) {
+        // Se tiver status diferentes, manter apenas o último selecionado
+        const lastSelected = this.selectedSchedules[this.selectedSchedules.length - 1]
+        const lastSelectedSchedule = (this.schedules || []).find(s => s.id === lastSelected)
+        if (lastSelectedSchedule) {
+          this.selectedSchedules = this.selectedSchedules.filter(id => {
+            const schedule = (this.schedules || []).find(s => s.id === id)
+            return schedule && schedule.status === lastSelectedSchedule.status
+          })
+        }
+      }
+    },
   },
   async mounted() {
     try {
