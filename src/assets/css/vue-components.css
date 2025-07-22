@@ -317,6 +317,11 @@
     font-size: 0.8rem;
 }
 
+.status-badge.contestado {
+  background: #fd7e14;
+  color: #fff;
+}
+
 /* Action buttons in table */
 .btn-icon {
     margin-right: 4px;
