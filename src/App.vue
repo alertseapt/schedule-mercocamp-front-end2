@@ -27,13 +27,6 @@
           <StatsCards :stats="dashboardStats" :loading="statsLoading">
           </StatsCards>
 
-          <!-- Recent Activities -->
-          <RecentActivities
-            :activities="recentActivities"
-            :loading="activitiesLoading"
-          >
-          </RecentActivities>
-
           <!-- Pending Deliveries Table -->
           <PendingDeliveries
             :deliveries="pendingDeliveries"
