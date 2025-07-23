@@ -746,6 +746,10 @@ export default {
       this.showInfoModal = false
       this.selectedSchedule = null
     },
+    openEditModal(schedule) {
+      this.scheduleToEdit = schedule || this.selectedSchedule
+      this.showEditModal = true
+    },
   },
 }
 
