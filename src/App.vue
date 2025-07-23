@@ -145,6 +145,7 @@
             </div>
 
             <!-- Modals -->
+            <div v-if="showEditModal" style="color: red; font-weight: bold;">DEBUG: Modal de edição deveria estar visível</div>
             <NfeInfoModal v-if="showInfoModal" :nfe-data="selectedSchedule" :show-modal="showInfoModal" :user="user" @close="closeInfoModal" @edit="openEditModal" />
             <ScheduleCreationModal v-if="showCreationModal" :show-modal="showCreationModal" @close="closeCreationModal" @created="loadSchedules" />
             <ScheduleEditModal v-if="showEditModal" :schedule-data="scheduleToEdit" :show-modal="showEditModal" @close="closeEditModal" @updated="handleScheduleUpdated" @notification="addNotification" />
@@ -750,6 +751,9 @@ export default {
       console.log('openEditModal chamado com:', schedule)
       this.scheduleToEdit = schedule || this.selectedSchedule
       this.showEditModal = true
+      setTimeout(() => {
+        console.log('showEditModal:', this.showEditModal, 'scheduleToEdit:', this.scheduleToEdit)
+      }, 100)
     },
   },
 }
