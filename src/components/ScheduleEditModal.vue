@@ -1,11 +1,12 @@
 <template>
   <div>
     <div style="color: blue; font-weight: bold;">DEBUG: ScheduleEditModal está sendo renderizado</div>
-    <div v-if="showModal" class="modal-overlay" @click="handleModalClick">
+    <div class="modal-overlay" @click="handleModalClick" style="z-index: 9999; display: flex !important; background: rgba(0,0,0,0.7);">
       <div
         class="modal-content large schedule-edit-modal"
         ref="modal"
         tabindex="-1"
+        style="background: #fff; border: 2px solid red; z-index: 10000; display: block !important;"
       >
         <!-- Header -->
         <div class="modal-header">
