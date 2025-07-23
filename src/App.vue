@@ -148,7 +148,7 @@
             <div v-if="showEditModal" style="color: red; font-weight: bold;">DEBUG: Modal de edição deveria estar visível</div>
             <NfeInfoModal v-if="showInfoModal" :nfe-data="selectedSchedule" :show-modal="showInfoModal" :user="user" @close="closeInfoModal" @edit="openEditModal" />
             <ScheduleCreationModal v-if="showCreationModal" :show-modal="showCreationModal" @close="closeCreationModal" @created="loadSchedules" />
-            <ScheduleEditModal v-if="showEditModal" :schedule-data="scheduleToEdit" :show-modal="showEditModal" @close="closeEditModal" @updated="handleScheduleUpdated" @notification="addNotification" />
+            <ScheduleEditModal :schedule-data="scheduleToEdit" :show-modal="true" @close="closeEditModal" @updated="handleScheduleUpdated" @notification="addNotification" />
           </div>
         </div>
 
@@ -507,7 +507,7 @@ export default {
         this.loadPendingDeliveries(),
       ]
       try {
-        await Promise.all(promises)
+      await Promise.all(promises)
         console.log('Dashboard carregado com sucesso!')
       } catch (error) {
         console.error('Erro ao carregar dashboard:', error)

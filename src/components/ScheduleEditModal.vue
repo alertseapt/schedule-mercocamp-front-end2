@@ -1,167 +1,170 @@
 <template>
-  <div v-if="showModal" class="modal-overlay" @click="handleModalClick">
-    <div
-      class="modal-content large schedule-edit-modal"
-      ref="modal"
-      tabindex="-1"
-    >
-      <!-- Header -->
-      <div class="modal-header">
-        <h3>
-          <i class="fas fa-edit"></i>
-          Editar Agendamento
-        </h3>
-        <button class="btn-close" @click="closeModal">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <!-- Errors -->
-      <div v-if="errors.length > 0" class="error-container">
-        <div
-          v-for="(error, index) in errors"
-          :key="index"
-          class="error-message"
-        >
-          <i class="fas fa-exclamation-triangle"></i>
-          {{ error }}
-          <button @click="removeError(index)" class="btn-close-error">
+  <div>
+    <div style="color: blue; font-weight: bold;">DEBUG: ScheduleEditModal está sendo renderizado</div>
+    <div v-if="showModal" class="modal-overlay" @click="handleModalClick">
+      <div
+        class="modal-content large schedule-edit-modal"
+        ref="modal"
+        tabindex="-1"
+      >
+        <!-- Header -->
+        <div class="modal-header">
+          <h3>
+            <i class="fas fa-edit"></i>
+            Editar Agendamento
+          </h3>
+          <button class="btn-close" @click="closeModal">
             <i class="fas fa-times"></i>
           </button>
         </div>
-      </div>
 
-      <!-- Form -->
-      <div class="modal-body">
-        <form @submit.prevent="updateSchedule" class="edit-form">
-          <!-- Informações Básicas -->
-          <div class="form-section">
-            <h4><i class="fas fa-info-circle"></i> Informações Básicas</h4>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="nfe_number">Número da NF-e</label>
-                <input
-                  id="nfe_number"
-                  v-model="formData.number"
-                  type="text"
-                  class="form-control"
-                  readonly
-                />
-              </div>
-              <div class="form-group">
-                <label for="nfe_key">Chave da NF-e</label>
-                <input
-                  id="nfe_key"
-                  v-model="formData.nfe_key"
-                  type="text"
-                  class="form-control"
-                  readonly
-                />
+        <!-- Errors -->
+        <div v-if="errors.length > 0" class="error-container">
+          <div
+            v-for="(error, index) in errors"
+            :key="index"
+            class="error-message"
+          >
+            <i class="fas fa-exclamation-triangle"></i>
+            {{ error }}
+            <button @click="removeError(index)" class="btn-close-error">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="modal-body">
+          <form @submit.prevent="updateSchedule" class="edit-form">
+            <!-- Informações Básicas -->
+            <div class="form-section">
+              <h4><i class="fas fa-info-circle"></i> Informações Básicas</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="nfe_number">Número da NF-e</label>
+                  <input
+                    id="nfe_number"
+                    v-model="formData.number"
+                    type="text"
+                    class="form-control"
+                    readonly
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="nfe_key">Chave da NF-e</label>
+                  <input
+                    id="nfe_key"
+                    v-model="formData.nfe_key"
+                    type="text"
+                    class="form-control"
+                    readonly
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Status e Data -->
-          <div class="form-section">
-            <h4><i class="fas fa-calendar-check"></i> Agendamento</h4>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="status">Status</label>
-                <select
-                  id="status"
-                  v-model="formData.status"
-                  class="form-control"
-                  required
-                >
-                  <option value="">Selecione um status</option>
-                  <option value="Solicitado">Solicitado</option>
-                  <option value="Agendado">Agendado</option>
-                  <option value="Recebido">Recebido</option>
-                  <option value="Tratativa">Tratativa</option>
-                  <option value="Estoque">Estoque</option>
-                  <option value="Recusar">Recusar</option>
-                  <option value="Recusado">Recusado</option>
-                  <option value="Cancelado">Cancelado</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="delivery_date">Data de Entrega</label>
-                <input
-                  id="delivery_date"
-                  v-model="formData.date"
-                  type="datetime-local"
-                  class="form-control"
-                  required
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Cliente -->
-          <div class="form-section">
-            <h4><i class="fas fa-building"></i> Cliente</h4>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="client">Cliente</label>
-                <input
-                  id="client"
-                  v-model="formData.client"
-                  type="text"
-                  class="form-control"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label for="case_count">Quantidade de Volumes</label>
-                <input
-                  id="case_count"
-                  v-model="formData.case_count"
-                  type="number"
-                  class="form-control"
-                  min="1"
-                  required
-                />
+            <!-- Status e Data -->
+            <div class="form-section">
+              <h4><i class="fas fa-calendar-check"></i> Agendamento</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="status">Status</label>
+                  <select
+                    id="status"
+                    v-model="formData.status"
+                    class="form-control"
+                    required
+                  >
+                    <option value="">Selecione um status</option>
+                    <option value="Solicitado">Solicitado</option>
+                    <option value="Agendado">Agendado</option>
+                    <option value="Recebido">Recebido</option>
+                    <option value="Tratativa">Tratativa</option>
+                    <option value="Estoque">Estoque</option>
+                    <option value="Recusar">Recusar</option>
+                    <option value="Recusado">Recusado</option>
+                    <option value="Cancelado">Cancelado</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="delivery_date">Data de Entrega</label>
+                  <input
+                    id="delivery_date"
+                    v-model="formData.date"
+                    type="datetime-local"
+                    class="form-control"
+                    required
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Observações -->
-          <div class="form-section">
-            <h4><i class="fas fa-sticky-note"></i> Observações</h4>
-            <div class="form-group">
-              <label for="observations">Observações Adicionais</label>
-              <textarea
-                id="observations"
-                v-model="formData.observations"
-                class="form-control"
-                rows="3"
-                placeholder="Digite observações sobre este agendamento..."
-              ></textarea>
+            <!-- Cliente -->
+            <div class="form-section">
+              <h4><i class="fas fa-building"></i> Cliente</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="client">Cliente</label>
+                  <input
+                    id="client"
+                    v-model="formData.client"
+                    type="text"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="case_count">Quantidade de Volumes</label>
+                  <input
+                    id="case_count"
+                    v-model="formData.case_count"
+                    type="number"
+                    class="form-control"
+                    min="1"
+                    required
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </form>
-      </div>
 
-      <!-- Footer -->
-      <div class="modal-footer">
-        <button
-          type="button"
-          @click="closeModal"
-          class="btn btn-secondary"
-          :disabled="loading"
-        >
-          Cancelar
-        </button>
-        <button
-          type="button"
-          @click="updateSchedule"
-          :disabled="loading || !isFormValid"
-          class="btn btn-primary"
-        >
-          <i v-if="loading" class="fas fa-spinner fa-spin"></i>
-          <i v-else class="fas fa-save"></i>
-          {{ loading ? 'Salvando...' : 'Salvar Alterações' }}
-        </button>
+            <!-- Observações -->
+            <div class="form-section">
+              <h4><i class="fas fa-sticky-note"></i> Observações</h4>
+              <div class="form-group">
+                <label for="observations">Observações Adicionais</label>
+                <textarea
+                  id="observations"
+                  v-model="formData.observations"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Digite observações sobre este agendamento..."
+                ></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button
+            type="button"
+            @click="closeModal"
+            class="btn btn-secondary"
+            :disabled="loading"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            @click="updateSchedule"
+            :disabled="loading || !isFormValid"
+            class="btn btn-primary"
+          >
+            <i v-if="loading" class="fas fa-spinner fa-spin"></i>
+            <i v-else class="fas fa-save"></i>
+            {{ loading ? 'Salvando...' : 'Salvar Alterações' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
