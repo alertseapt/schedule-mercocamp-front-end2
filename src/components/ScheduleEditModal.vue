@@ -356,6 +356,7 @@ export default {
   },
 
   mounted() {
+    console.log('ScheduleEditModal montado com scheduleData:', this.scheduleData)
     this.$nextTick(() => {
       const modal = this.$refs.modal
       if (modal) {

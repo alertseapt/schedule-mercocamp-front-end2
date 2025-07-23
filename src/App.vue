@@ -747,6 +747,7 @@ export default {
       this.selectedSchedule = null
     },
     openEditModal(schedule) {
+      console.log('openEditModal chamado com:', schedule)
       this.scheduleToEdit = schedule || this.selectedSchedule
       this.showEditModal = true
     },
